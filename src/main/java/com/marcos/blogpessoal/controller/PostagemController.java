@@ -62,6 +62,6 @@ public class PostagemController {
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		postagemRepository.deleteById(id);
-		//TODO: usar o optional para resolver o problema de remover um id não existente.
+		//TODO: usar o optional para resolver o problema do status 200 ao tentar remover uma postagem que não existe.
 	}
 }
