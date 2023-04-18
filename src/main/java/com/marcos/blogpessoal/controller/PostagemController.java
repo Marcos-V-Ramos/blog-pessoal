@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.marcos.blogpessoal.entity.Postagem;
 import com.marcos.blogpessoal.repository.PostagemRepository;
+import com.marcos.blogpessoal.repository.TemaRepository;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +30,9 @@ public class PostagemController {
 
 	@Autowired
 	private PostagemRepository postagemRepository;
+	
+	@Autowired
+	private TemaRepository temaRepository;
 	
 	@GetMapping
 	public ResponseEntity<List<Postagem>> getAll(){
