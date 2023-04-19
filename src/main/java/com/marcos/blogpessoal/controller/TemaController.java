@@ -48,7 +48,12 @@ public class TemaController {
 	
 	@PutMapping
 	public ResponseEntity<Tema> updateTema(@Valid @RequestBody Tema tema) {
-		return ResponseEntity.status(201).body(temaRepository.save(tema));
+		Optional<Tema> temaProcurado = temaRepository.findById(tema.getId());
+		
+		if (temaProcurado.isPresent()) {
+			return ResponseEntity.status(201).body(temaRepository.save(tema));
+		}
+		return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
@@ -62,11 +67,15 @@ public class TemaController {
 				.body(temaRepository.findAllByDescricaoContainingIgnoreCase(descricao));
 	}
 	
-	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("id/{id}")
-	public void removeById(@PathVariable Long id) {
-		temaRepository.deleteById(id);
+	public ResponseEntity<?> removeById(@PathVariable Long id) {
+		Optional<Tema> temaProcurado = temaRepository.findById(id);
+		
+		if (temaProcurado.isPresent()) {
+			temaRepository.delete(temaProcurado.get());
+			return ResponseEntity.noContent().build();
+		}
+		
+		return ResponseEntity.notFound().build();
 	}
-	
-	//TODO: resolver os desafios do PostagemController
 }

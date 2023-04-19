@@ -1,9 +1,11 @@
 package com.marcos.blogpessoal.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +23,6 @@ import com.marcos.blogpessoal.repository.PostagemRepository;
 import com.marcos.blogpessoal.repository.TemaRepository;
 
 import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping("/postagens")
@@ -58,14 +59,24 @@ public class PostagemController {
 	
 	@PutMapping
 	public ResponseEntity<Postagem> put(@Valid @RequestBody Postagem postagem) {
-		return ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem));
-		//TODO: desafio - resolver o problema de criar uma nova postagem ao passar um id que não existe.
+		Optional<Postagem> findPostagem = postagemRepository.findById(postagem.getId());
+		
+		if (findPostagem.isPresent()) {
+			return ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem));
+		}
+		
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 	
-	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) {
-		postagemRepository.deleteById(id);
-		//TODO: usar o optional para resolver o problema do status 200 ao tentar remover uma postagem que não existe.
+	public ResponseEntity<?> delete(@PathVariable Long id) {
+		Optional<Postagem> post = postagemRepository.findById(id);
+		
+		if (post.isPresent()) {
+			postagemRepository.delete(post.get());
+			return ResponseEntity.noContent().build();
+		}
+		
+		return ResponseEntity.notFound().build();
 	}
 }
