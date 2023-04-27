@@ -35,7 +35,7 @@ public class TemaController {
 		return ResponseEntity.status(200).body(temaRepository.findAll());
 	}
 	
-	@GetMapping("id/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Tema> getById(@PathVariable Long id) {
 		Optional<Tema> handleTema = temaRepository.findById(id);
 		
@@ -46,8 +46,19 @@ public class TemaController {
 		}
 	}
 	
+	@GetMapping("descricao/{descricao}")
+	public ResponseEntity<List<Tema>> findAllByDescricao(@PathVariable String descricao) {
+		return ResponseEntity.status(200)
+				.body(temaRepository.findAllByDescricaoContainingIgnoreCase(descricao));
+	}
+	
+	@PostMapping
+	public ResponseEntity<Tema> postTema(@Valid @RequestBody Tema tema) {
+		return ResponseEntity.status(200).body(temaRepository.save(tema));
+	}
+	
 	@PutMapping
-	public ResponseEntity<Tema> updateTema(@Valid @RequestBody Tema tema) {
+	public ResponseEntity<Tema> putTema(@Valid @RequestBody Tema tema) {
 		Optional<Tema> temaProcurado = temaRepository.findById(tema.getId());
 		
 		if (temaProcurado.isPresent()) {
@@ -56,23 +67,12 @@ public class TemaController {
 		return ResponseEntity.notFound().build();
 	}
 	
-	@PostMapping
-	public ResponseEntity<Tema> addTema(@Valid @RequestBody Tema tema) {
-		return ResponseEntity.status(200).body(temaRepository.save(tema));
-	}
-	
-	@GetMapping("descricao/{descricao}")
-	public ResponseEntity<List<Tema>> findAllByDescricao(@PathVariable String descricao) {
-		return ResponseEntity.status(200)
-				.body(temaRepository.findAllByDescricaoContainingIgnoreCase(descricao));
-	}
-	
-	@DeleteMapping("id/{id}")
-	public ResponseEntity<?> removeById(@PathVariable Long id) {
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> removeById(@PathVariable Long id) {
 		Optional<Tema> temaProcurado = temaRepository.findById(id);
 		
 		if (temaProcurado.isPresent()) {
-			temaRepository.delete(temaProcurado.get());
+			temaRepository.deleteById(temaProcurado.get().getId());
 			return ResponseEntity.noContent().build();
 		}
 		
